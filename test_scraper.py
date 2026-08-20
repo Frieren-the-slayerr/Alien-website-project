@@ -12,6 +12,7 @@ from scraper import (
     safe_filename,
     save_records,
     is_alien_film_record,
+    search_official_sources,
 )
 
 
@@ -72,6 +73,14 @@ class ScraperTests(unittest.TestCase):
             saved = json.loads(output_file.read_text(encoding="utf-8"))
         self.assertEqual(saved[0]["title"], "Public lead")
         self.assertEqual(saved[0]["image_urls"], [])
+
+    def test_official_source_index_includes_current_release(self) -> None:
+        records = search_official_sources("alien OR UFO OR UAP")
+        self.assertTrue(any(record.identifier == "pursue-release-05-2026-08-07" for record in records))
+        self.assertTrue(any(record.identifier == "aaro-ctx-special-issue-2026" for record in records))
+
+    def test_official_source_index_ignores_unrelated_queries(self) -> None:
+        self.assertEqual(search_official_sources("weather satellite"), [])
 
 
 if __name__ == "__main__":

@@ -9,75 +9,120 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="GradientText.css">
 </head>
 <body>
+  <div id="lightfall-background" class="lightfall-container" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
   <header class="topbar">
+    <button class="home-button" type="button" data-view="archive" aria-label="Return to home">Home</button>
     <a class="brand" href="./" aria-label="Signal Archive home">
       <span class="brand-mark" aria-hidden="true">◒</span>
       <span>Signal Archive</span>
     </a>
-    <div class="topbar-meta">
-      <span class="status-dot" aria-hidden="true"></span>
-      <span id="sync-status">LOCAL INDEX ONLINE</span>
-      <span class="topbar-code">IA / 2026</span>
-    </div>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <button class="nav-tab is-active" type="button" data-view="archive" aria-selected="true">Archive</button>
+      <button class="nav-tab" type="button" data-view="community" aria-selected="false">Community</button>
+    </nav>
   </header>
 
   <main>
-    <section class="hero" aria-labelledby="page-title">
-      <div class="hero-copy">
-        <p class="eyebrow">PUBLIC RECORDS / FIELD NOTES / UNRESOLVED</p>
-        <h1 id="page-title">Signals worth<br><em>looking twice at.</em></h1>
-        <p class="hero-deck">A focused index of public UFO, UAP, and extraterrestrial records preserved by the Internet Archive.</p>
-      </div>
-      <div class="hero-aside" aria-label="Archive summary">
-        <span class="aside-label">INDEX CONDITION</span>
-        <strong>OPEN / UNVERIFIED</strong>
-        <span class="aside-rule"></span>
-        <span class="aside-note">Every record links back to its source. Nothing here is presented as proof.</span>
-      </div>
-    </section>
-
-    <section class="control-band" aria-label="Archive controls">
+    <div id="archive-view">
+      <section class="control-band" aria-label="Archive search and controls">
       <label class="search-box">
         <span class="search-icon" aria-hidden="true">⌕</span>
         <span class="sr-only">Search records</span>
-        <input id="search-input" type="search" placeholder="Search titles, descriptions, people..." autocomplete="off">
+        <input id="search-input" type="search" placeholder="Search the archive..." autocomplete="off">
         <kbd>/</kbd>
       </label>
       <div class="filter-row">
-        <div class="filter-group" role="group" aria-label="Record type">
-          <button class="filter-button is-active" data-filter="all" type="button">All records</button>
-          <button class="filter-button" data-filter="images" type="button">With images</button>
-          <button class="filter-button" data-filter="text" type="button">Text only</button>
+        <div class="filter-group" role="tablist" aria-label="Record type">
+          <span class="filter-cursor" aria-hidden="true"></span>
+          <button class="filter-button is-active" data-filter="all" role="tab" aria-selected="true" type="button">All records</button>
+          <button class="filter-button" data-filter="images" role="tab" aria-selected="false" type="button">With images</button>
+          <button class="filter-button" data-filter="text" role="tab" aria-selected="false" type="button">Text only</button>
         </div>
         <label class="sort-control">
           <span>Sort</span>
           <select id="sort-select" aria-label="Sort records">
+            <option value="popular">Most popular</option>
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
             <option value="title">Title A-Z</option>
           </select>
         </label>
       </div>
-    </section>
+      </section>
 
-    <section class="results-head" aria-live="polite">
+      <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p id="gradient-text" class="hero-deck">A focused index of public UFO, UAP, and extraterrestrial records preserved by the Internet Archive.</p>
+      </div>
+      <div class="hero-aside" aria-label="Archive summary">
+        <span class="aside-note">Every record links back to its source. Nothing here is presented as proof.</span>
+      </div>
+      </section>
+
+      <section class="results-head" aria-live="polite">
       <div>
         <p class="section-label">ARCHIVE INDEX</p>
         <h2><span id="record-count">0</span> records in view</h2>
       </div>
       <p class="results-note" id="results-note">Loading the local index...</p>
-    </section>
+      </section>
 
-    <section id="record-grid" class="record-grid" aria-label="Research records"></section>
-    <div id="empty-state" class="empty-state" hidden>
+      <section id="record-grid" class="record-grid" aria-label="Research records"></section>
+      <div id="empty-state" class="empty-state" hidden>
       <span class="empty-symbol" aria-hidden="true">∅</span>
       <h2>No matching signals</h2>
       <p>Try a broader term or clear the current filter.</p>
       <button id="clear-button" class="text-button" type="button">Clear search</button>
+      </div>
     </div>
+
+    <section id="community-view" class="community-view" hidden aria-labelledby="community-title">
+      <div class="community-intro">
+        <p class="section-label">COMMUNITY</p>
+        <h1 id="community-title">Research community</h1>
+        <p>Researchers and contributors sharing sources, notes, and reviews across the archive.</p>
+        <button class="community-action" type="button" data-view="join">Join the community <span aria-hidden="true">↗</span></button>
+      </div>
+      <div class="community-stats" aria-label="Community statistics">
+        <div><strong>2,486</strong><span>users</span></div>
+        <div><strong>184</strong><span>notes shared</span></div>
+        <div><strong>37</strong><span>active reviews</span></div>
+      </div>
+      <div class="community-feed">
+        <article class="community-post"><span class="post-avatar">AM</span><div><strong>Alex M.</strong><span class="post-meta">joined 8 min ago</span><p>“The 1977 coastal report has a second source worth comparing.”</p></div></article>
+        <article class="community-post"><span class="post-avatar">JR</span><div><strong>Jordan R.</strong><span class="post-meta">shared a note</span><p>“Adding a source comparison for the northern range records.”</p></div></article>
+        <article class="community-post"><span class="post-avatar">SK</span><div><strong>Sam K.</strong><span class="post-meta">created a review</span><p>“Three related records are being organized into a timeline.”</p></div></article>
+      </div>
+    </section>
+
+    <section id="join-view" class="join-view" hidden aria-labelledby="join-title">
+      <button class="back-button" type="button" data-view="community">← Back to community</button>
+      <div class="join-layout">
+        <div class="join-intro">
+          <p class="section-label">COMMUNITY ACCESS</p>
+          <h1 id="join-title">Welcome back.</h1>
+          <p>Sign in to follow reviews, save sources, and contribute notes to the archive.</p>
+        </div>
+        <form id="join-form" class="join-form">
+          <label for="join-email">Email</label>
+          <input id="join-email" name="email" type="email" autocomplete="email" required>
+          <div class="password-label-row">
+            <label for="join-password">Password</label>
+            <a href="#join-password">Forgot password?</a>
+          </div>
+          <input id="join-password" name="password" type="password" autocomplete="current-password" required>
+          <label class="remember-option"><input name="remember" type="checkbox"> <span>Remember me</span></label>
+          <button class="join-submit" type="submit">Sign in <span aria-hidden="true">↗</span></button>
+          <div class="form-divider"><span>or continue with</span></div>
+          <button class="alternate-submit" type="button">Continue with Google</button>
+          <p id="join-feedback" class="join-feedback" role="status"></p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <div id="detail-dialog" class="dialog-backdrop" hidden>
@@ -102,10 +147,19 @@
     </article>
   </div>
 
-  <footer class="footer">
-    <span>Signal Archive / public-source research interface</span>
-    <span>Internet Archive records · <a href="https://archive.org/" target="_blank" rel="noreferrer">archive.org ↗</a></span>
-  </footer>
   <script src="app.js"></script>
+  <script type="module">
+    import GradientText from './GradientText.js';
+
+    GradientText({
+      target: document.querySelector('#gradient-text'),
+      children: 'A focused index of public UFO, UAP, and extraterrestrial records preserved by the Internet Archive.',
+      colors: ['#f0f0ec', '#f0444d', '#f0f0ec'],
+      animationSpeed: 3,
+      showBorder: false,
+      className: 'hero-deck',
+    });
+  </script>
+  <script type="module" src="lightfall.js"></script>
 </body>
 </html>

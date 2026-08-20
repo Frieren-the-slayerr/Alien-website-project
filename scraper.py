@@ -37,8 +37,6 @@ ALIEN_FILM_MARKERS = (
     "nostromo",
     "lv-426",
 )
-
-
 @dataclass(frozen=True)
 class Record:
     """A normalized result from a public source."""
@@ -51,6 +49,71 @@ class Record:
     description: str | None = None
     identifier: str | None = None
     image_urls: tuple[str, ...] = ()
+
+
+OFFICIAL_SOURCE_RECORDS = (
+    Record(
+        source="pursue_2026",
+        title="PURSUE Release 05: UAP Records Released August 7, 2026",
+        url="https://www.war.gov/UFO/",
+        published_at="2026-08-07",
+        author="Department of War",
+        description="Fifth tranche of records released through the Presidential Unsealing and Reporting System for UAP Encounters (PURSUE). The source describes these materials as unresolved cases and provides searchable downloads.",
+        identifier="pursue-release-05-2026-08-07",
+        image_urls=(
+            "https://www.war.gov/portals/1/Interactive/2026/UFO/080726/Slideshow/DOW-UAP-D098_Film-Analysis-of-Unidentified-Objects_1953.jpg",
+        ),
+    ),
+    Record(
+        source="aaro",
+        title="UAP Science and Analysis: Naval Postgraduate School CTX Special Issue",
+        url="https://www.aaro.mil/UAP-Records/",
+        published_at="2026-07-08",
+        author="All-domain Anomaly Resolution Office",
+        description="A 2026 information paper listed by AARO covering scientific analysis, data collection, standardized reporting, and UAP safety and security questions.",
+        identifier="aaro-ctx-special-issue-2026",
+    ),
+    Record(
+        source="aaro",
+        title="AARO UAP Records and Information Papers",
+        url="https://www.aaro.mil/UAP-Records/",
+        author="All-domain Anomaly Resolution Office",
+        description="Official records and information papers covering UAP analysis, declassification, materials testing, satellite flaring, and forced perspective.",
+        identifier="aaro-uap-records",
+    ),
+    Record(
+        source="aaro",
+        title="AARO Official UAP Imagery",
+        url="https://www.aaro.mil/UAP-Cases/Official-UAP-Imagery/",
+        author="All-domain Anomaly Resolution Office",
+        description="AARO’s public index of official UAP imagery and videos, including newly published case material.",
+        identifier="aaro-official-uap-imagery",
+    ),
+    Record(
+        source="national_archives",
+        title="Record Group 615: UAP Records Collection",
+        url="https://www.archives.gov/research/topics/uaps/rg-615",
+        author="National Archives and Records Administration",
+        description="The National Archives collection established for UAP records transferred by federal agencies under the 2024 National Defense Authorization Act.",
+        identifier="nara-rg-615-uap",
+    ),
+    Record(
+        source="national_archives",
+        title="Project BLUE BOOK: Unidentified Flying Objects",
+        url="https://www.archives.gov/research/military/air-force/ufos",
+        author="National Archives and Records Administration",
+        description="Declassified Air Force records concerning Project BLUE BOOK, including historical investigations from 1947 through 1969.",
+        identifier="nara-project-blue-book",
+    ),
+    Record(
+        source="fbi_vault",
+        title="FBI Vault: UFO Files",
+        url="https://vault.fbi.gov/UFO",
+        author="Federal Bureau of Investigation",
+        description="Public FBI Vault records released through the FOIA Library, including scanned UFO files and related documents.",
+        identifier="fbi-vault-ufo",
+    ),
+)
 
 
 class PublicSourceClient:
@@ -184,6 +247,14 @@ def is_alien_film_record(record: Record) -> bool:
     return any(marker in searchable_text for marker in ALIEN_FILM_MARKERS)
 
 
+def search_official_sources(query: str) -> list[Record]:
+    """Return curated links to verified official UAP and UFO collections."""
+    terms = {term.lower() for term in re.findall(r"[a-z0-9]+", query.lower())}
+    if not terms or terms.intersection({"alien", "ufo", "ufos", "uap", "uaps"}):
+        return list(OFFICIAL_SOURCE_RECORDS)
+    return []
+
+
 def collect_records(
     client: PublicSourceClient,
     query: str,
@@ -191,6 +262,7 @@ def collect_records(
     limit: int,
     download_images: bool,
     output_dir: Path,
+    enrich_images: bool = True,
 ) -> list[Record]:
     """Collect, enrich, optionally download, and deduplicate records."""
     records: list[Record] = []
@@ -199,6 +271,8 @@ def collect_records(
         try:
             if source == "archive":
                 records.extend(search_internet_archive(client, query, limit))
+            elif source == "official":
+                records.extend(search_official_sources(query))
             else:
                 raise ValueError(f"Unsupported source: {source}")
         except RuntimeError as error:
@@ -211,7 +285,7 @@ def collect_records(
         if record.url in seen_urls:
             continue
         seen_urls.add(record.url)
-        if record.source == "internet_archive":
+        if record.source == "internet_archive" and enrich_images:
             try:
                 record = add_archive_images(client, record)
             except RuntimeError as error:
@@ -245,10 +319,15 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line interface."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--query", default=DEFAULT_QUERY)
-    parser.add_argument("--source", choices=("archive",), action="append", dest="sources")
+    parser.add_argument("--source", choices=("archive", "official"), action="append", dest="sources")
     parser.add_argument("--limit", type=int, default=25)
     parser.add_argument("--output", type=Path, default=Path("data/records.json"))
     parser.add_argument("--download-images", action="store_true")
+    parser.add_argument(
+        "--skip-image-enrichment",
+        action="store_true",
+        help="Skip one metadata request per Archive item for faster large collections",
+    )
     return parser
 
 
@@ -256,16 +335,17 @@ def main() -> int:
     """Run the collector and return its process exit code."""
     parser = build_parser()
     arguments = parser.parse_args()
-    if arguments.limit < 1 or arguments.limit > 100:
-        parser.error("--limit must be between 1 and 100")
+    if arguments.limit < 1 or arguments.limit > 1000:
+        parser.error("--limit must be between 1 and 1000")
     try:
         records = collect_records(
             PublicSourceClient(),
             arguments.query,
-            arguments.sources or ["archive"],
+            arguments.sources or ["archive", "official"],
             arguments.limit,
             arguments.download_images,
             arguments.output.parent,
+            not arguments.skip_image_enrichment,
         )
         save_records(records, arguments.output)
     except (RuntimeError, ValueError) as error:
