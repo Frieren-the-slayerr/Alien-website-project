@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A public-source archive explorer for UFO, UAP, and extraterrestrial research records.">
+  <title>Signal Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Signal Archive home">
+      <span class="brand-mark" aria-hidden="true">◒</span>
+      <span>Signal Archive</span>
+    </a>
+    <div class="topbar-meta">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="sync-status">LOCAL INDEX ONLINE</span>
+      <span class="topbar-code">IA / 2026</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">PUBLIC RECORDS / FIELD NOTES / UNRESOLVED</p>
+        <h1 id="page-title">Signals worth<br><em>looking twice at.</em></h1>
+        <p class="hero-deck">A focused index of public UFO, UAP, and extraterrestrial records preserved by the Internet Archive.</p>
+      </div>
+      <div class="hero-aside" aria-label="Archive summary">
+        <span class="aside-label">INDEX CONDITION</span>
+        <strong>OPEN / UNVERIFIED</strong>
+        <span class="aside-rule"></span>
+        <span class="aside-note">Every record links back to its source. Nothing here is presented as proof.</span>
+      </div>
+    </section>
+
+    <section class="control-band" aria-label="Archive controls">
+      <label class="search-box">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <span class="sr-only">Search records</span>
+        <input id="search-input" type="search" placeholder="Search titles, descriptions, people..." autocomplete="off">
+        <kbd>/</kbd>
+      </label>
+      <div class="filter-row">
+        <div class="filter-group" role="group" aria-label="Record type">
+          <button class="filter-button is-active" data-filter="all" type="button">All records</button>
+          <button class="filter-button" data-filter="images" type="button">With images</button>
+          <button class="filter-button" data-filter="text" type="button">Text only</button>
+        </div>
+        <label class="sort-control">
+          <span>Sort</span>
+          <select id="sort-select" aria-label="Sort records">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="title">Title A-Z</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="results-head" aria-live="polite">
+      <div>
+        <p class="section-label">ARCHIVE INDEX</p>
+        <h2><span id="record-count">0</span> records in view</h2>
+      </div>
+      <p class="results-note" id="results-note">Loading the local index...</p>
+    </section>
+
+    <section id="record-grid" class="record-grid" aria-label="Research records"></section>
+    <div id="empty-state" class="empty-state" hidden>
+      <span class="empty-symbol" aria-hidden="true">∅</span>
+      <h2>No matching signals</h2>
+      <p>Try a broader term or clear the current filter.</p>
+      <button id="clear-button" class="text-button" type="button">Clear search</button>
+    </div>
+  </main>
+
+  <div id="detail-dialog" class="dialog-backdrop" hidden>
+    <article class="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <button id="close-dialog" class="icon-button close-button" type="button" aria-label="Close record details">×</button>
+      <div id="detail-image-wrap" class="detail-image-wrap" hidden></div>
+      <div class="detail-content">
+        <p id="detail-source" class="detail-kicker"></p>
+        <h2 id="detail-title"></h2>
+        <p id="detail-description" class="detail-description"></p>
+        <dl class="detail-meta">
+          <div><dt>Published</dt><dd id="detail-date"></dd></div>
+          <div><dt>Filed by</dt><dd id="detail-author"></dd></div>
+          <div><dt>Identifier</dt><dd id="detail-id"></dd></div>
+        </dl>
+        <div class="detail-actions">
+          <a id="detail-source-link" class="primary-button" href="#" target="_blank" rel="noreferrer">Open original record <span aria-hidden="true">↗</span></a>
+          <button id="copy-link" class="secondary-button" type="button">Copy link</button>
+        </div>
+        <p id="copy-feedback" class="copy-feedback" role="status"></p>
+      </div>
+    </article>
+  </div>
+
+  <footer class="footer">
+    <span>Signal Archive / public-source research interface</span>
+    <span>Internet Archive records · <a href="https://archive.org/" target="_blank" rel="noreferrer">archive.org ↗</a></span>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
